@@ -1,186 +1,928 @@
-# Agent Simulation Lab · MCP
+# Agent Simulation Lab — Multi-Agent Architecture Simulator with MCP
 
-A working local application with a React frontend, FastAPI backend, SQLite persistence, and an MCP server. Six independent agent architectures control their own fictional food-delivery simulations. The dashboard and MCP server share the same simulation engine and database.
+> An interactive AI agent simulation platform featuring six intelligent agent architectures, a Three.js 3D delivery environment, real-time visualization of recorded simulations, FastAPI services, SQLite persistence, and Model Context Protocol (MCP) integration.
 
-## Start the application
+## Project Overview
 
-Dependencies and the production frontend have already been installed/built in this folder. **Double-click `Start.cmd`**, or run:
+**Agent Simulation Lab** is a locally hosted simulation and experimentation platform designed to demonstrate the behavior, decision-making processes, and performance of six artificial intelligence agent architectures in a fictional food-delivery environment.
 
-```powershell
-Set-Location 'D:\Desktop\Projects\Agent Simulation MCP'
-.\Start.ps1
+The project combines a **React frontend**, a **Three.js 3D city visualization**, a **FastAPI backend**, an **SQLite database**, and an **MCP server**. All components use a shared simulation engine, allowing simulations to be executed through the graphical dashboard, REST API, or MCP-compatible AI clients.
+
+The platform supports reproducible experiments, scenario-based comparisons, decision trace inspection, learning-agent training, persistent simulation history, and interactive replay.
+
+The six agents are independently evaluated under equivalent conditions. They do not communicate or cooperate in a shared multi-agent environment.
+
+---
+
+## Table of Contents
+
+1. [Key Features](#key-features)
+2. [Technology Stack](#technology-stack)
+3. [System Architecture](#system-architecture)
+4. [AI Agent Architectures](#ai-agent-architectures)
+5. [Simulation Environment](#simulation-environment)
+6. [Interactive 3D Visualization](#interactive-3d-visualization)
+7. [Simulation and Decision-Making Logic](#simulation-and-decision-making-logic)
+8. [Learning Agent and Training](#learning-agent-and-training)
+9. [MCP Server Integration](#mcp-server-integration)
+10. [Installation and Setup](#installation-and-setup)
+11. [Running the Application](#running-the-application)
+12. [Development and Testing](#development-and-testing)
+13. [Database and Persistence](#database-and-persistence)
+14. [Project Structure](#project-structure)
+15. [Limitations and Scope](#limitations-and-scope)
+
+---
+
+## Key Features
+
+### Six AI Agent Architectures
+
+Explore and compare six agent implementations:
+
+- Simple Reflex Agent
+- Model-Based Reflex Agent
+- Goal-Based Agent
+- Utility-Based Agent
+- Learning Agent
+- Hierarchical Agent
+
+Each architecture follows its own decision-making strategy and can be evaluated under the same simulated route conditions.
+
+### Interactive Simulation Dashboard
+
+- Configure simulation scenarios and agent selections.
+- Set simulation seeds and delivery deadlines.
+- Adjust bounded route variation.
+- Execute individual agent experiments.
+- Compare all six architectures under shared conditions.
+- Inspect agent decisions and execution traces.
+- Review saved simulation results.
+
+### Three.js 3D City Environment
+
+- Interactive fictional city.
+- Animated food-delivery vehicle.
+- Buildings, trees, roads, river, and bridges.
+- Weather and traffic visualization.
+- Route highlighting and inspection.
+- Camera orbit, pan, and zoom.
+- Top-down and vehicle-following cameras.
+- Simulation replay controls.
+
+### Experimentation and Analytics
+
+- Reproducible seeded experiments.
+- Six-agent comparative analysis.
+- Saved run history.
+- Complete JSON export.
+- Summary CSV export.
+- Contextual-bandit training.
+- Learning reward visualization.
+- Before-and-after learning evaluation.
+
+### MCP Integration
+
+The project exposes **eight MCP tools** for external AI clients to inspect, execute, compare, and analyze simulations.
+
+---
+
+## Technology Stack
+
+| Component | Technology | Purpose |
+|---|---|---|
+| Frontend | React | Interactive application interface |
+| 3D Visualization | Three.js | Animated city and delivery replay |
+| Backend | FastAPI | REST API and simulation services |
+| Programming Language | Python | Agent architectures and simulation logic |
+| Frontend Tooling | Node.js and Vite | Development and production builds |
+| Database | SQLite | Persistent simulation results |
+| AI Integration | Model Context Protocol | External AI-client interaction |
+| MCP Implementation | FastMCP | MCP server and tool exposure |
+| Testing | pytest | Backend and integration verification |
+
+### System Requirements
+
+| Component | Requirement |
+|---|---|
+| Python | 3.11 or newer |
+| Node.js | 22.12+ or Node.js 24 LTS |
+| Database server | Not required |
+| GPU | Not required |
+| External maps API | Not required |
+| Cloud hosting | Not required |
+| LLM API key | Not required for core simulation |
+| MCP AI client | Optional |
+| Internet connection | Not required after dependencies are installed |
+
+The supplied environment was tested with Python 3.14.5 and Node.js 24.15.0.
+
+**Important:** The simulator implements agent decision algorithms directly. An OpenAI, Anthropic, or other model-provider API key is only required when a separately configured AI client needs one.
+
+---
+
+## System Architecture
+
+The application includes a React visualization layer, shared backend services, a simulation engine, persistent data storage, and an MCP interface.
+
+```text
+                  +-------------------------+
+                  |     React Dashboard     |
+                  |  Simulation Interface   |
+                  +------------+------------+
+                               |
+                               v
+                  +-------------------------+
+                  |       FastAPI API       |
+                  |   REST API + Services   |
+                  +------------+------------+
+                               |
+                               v
+                  +-------------------------+
+                  |    Simulation Engine    |
+                  |  Agent Decision Logic   |
+                  +------------+------------+
+                               |
+                               v
+                  +-------------------------+
+                  |     SQLite Database     |
+                  | Runs, Results, Training |
+                  +------------+------------+
+                               ^
+                               |
+                  +------------+------------+
+                  |        MCP Server       |
+                  |      Eight Tools        |
+                  +------------+------------+
+                               ^
+                               |
+                  +------------+------------+
+                  |  External MCP AI Client |
+                  +-------------------------+
 ```
 
-Open **http://127.0.0.1:8000**. API documentation: **http://127.0.0.1:8000/docs**. Keep the terminal open; Ctrl+C stops the server. If port 8000 is in use, run `.\Start.ps1 -Port 8010`. The API and built frontend use the same port.
+The REST API and MCP server use the same simulation services and database, allowing both interfaces to access saved experiments.
 
-For a hidden background server, use `.\Start-Background.ps1`; stop it with `.\Stop.ps1`. Both accept `-Port`. Background logs are written under `logs/`. `Stop.ps1` checks the process command line and refuses to stop an unrelated application.
+The dashboard and the MCP server can operate independently.
 
-If PowerShell blocks a local script, run `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Start.ps1` or use `Start.cmd`; no permanent execution-policy change is needed.
+---
 
-## What do I need? Is an LLM API required?
+## AI Agent Architectures
 
-| Component | Required? | Status / purpose |
-|---|---|---|
-| Python 3.11+ | Yes | Tested here with Python 3.14.5; isolated `.venv` installed |
-| Node.js 22.12+ or 24 LTS | For frontend development/builds | Tested here with Node 24.15.0 |
-| Database server | No | SQLite creates `data/simulation.sqlite3` automatically |
-| LLM API key | No for dashboard, simulator, API, and MCP server | Agent policies are implemented algorithms |
-| MCP-compatible AI client | Only for natural-language control | The client supplies model access, using its own subscription, local model, or provider API |
-| OpenAI / Anthropic / other provider key | Optional | Only needed if your chosen client/provider requires one |
-| GPU, maps API, cloud hosting | No | Fictional map; calculations run locally on CPU |
+### 1. Simple Reflex Agent
 
-There is **no built-in LLM chat box** in this version. Use the fully functional dashboard directly, or attach an AI client to the MCP server. No secrets need to be entered into the app. Once dependencies are installed, the application works offline; frontend fonts are bundled locally.
+The Simple Reflex Agent uses current observations and condition-action rules.
 
-## Features
+**Decision approach:**
 
-- Configure a scenario, one or more agents, seed, deadline, and bounded route variation.
-- Explore a Three.js 3D city with animated delivery replay, weather, traffic, buildings, trees, river, and bridges.
-- Orbit, pan, zoom, switch to a top-down camera, or follow the delivery van. Replay at 0.5×, 1×, 2×, or 4×.
-- Compare all six agents under the same pre-generated route conditions.
-- Search up to the latest 500 runs; paginated history remains available through the API.
-- Export each run as complete JSON or summary CSV.
-- Train a contextual bandit with epsilon-greedy exploration and persistent route reward estimates.
-- Inspect before/after evaluation and a reward curve from real training episodes.
-- Access eight tools over MCP stdio or loopback Streamable HTTP.
-- Eighteen measured baseline runs are initialized by the setup script only when the database is empty.
+- Observes the available traffic conditions.
+- Applies its predefined route-selection rules.
+- Selects an action based on the current observations.
+- Does not maintain a separate memory of earlier observations.
 
-## MCP connection
+This architecture demonstrates rule-based reactive behavior.
 
-The dashboard's **MCP connection** screen contains the exact JSON configuration and tool list. A portable example for clients using `mcpServers`:
+### 2. Model-Based Reflex Agent
+
+The Model-Based Reflex Agent extends reactive behavior with an internal representation of earlier observations.
+
+**Decision approach:**
+
+- Observes the current environment.
+- Retains information from previous observations.
+- Uses that information when current observations are incomplete.
+- Selects a route using its stored model and decision rules.
+
+This architecture is useful for studying partial observability.
+
+### 3. Goal-Based Agent
+
+The Goal-Based Agent selects actions based on a delivery objective.
+
+**Decision approach:**
+
+- Evaluates available routes.
+- Predicts route completion times.
+- Considers the configured delivery deadline.
+- Selects the cheapest route expected to satisfy the deadline.
+- Uses the fastest available route as a fallback when no route is predicted to satisfy the deadline.
+
+The architecture emphasizes goal satisfaction rather than fixed reactive rules.
+
+### 4. Utility-Based Agent
+
+The Utility-Based Agent evaluates routes using a numerical objective.
+
+Its route score is:
+
+```text
+Utility Cost = Duration + (Cost / 20) + (4 × Lateness)
+```
+
+The agent chooses the route with the lowest calculated score.
+
+This allows the agent to balance delivery duration, transportation cost, and lateness.
+
+The numerical weights are part of the project's fictional simulation model.
+
+### 5. Learning Agent
+
+The Learning Agent uses a contextual multi-armed bandit approach to estimate which route performs best in a given simulation context.
+
+Its implementation includes:
+
+- Epsilon-greedy exploration.
+- Persistent route reward estimates.
+- Route sampling and exploitation.
+- Explicit training episodes.
+- Before-and-after evaluation.
+- Reward curve visualization.
+
+Training occurs only when explicitly requested. Ordinary evaluation runs do not update the learned policy.
+
+### 6. Hierarchical Agent
+
+The Hierarchical Agent organizes delivery execution into subtasks.
+
+Its high-level stages are:
+
+```text
+Delivery Task
+     |
+     +-- Prepare Order
+     |
+     +-- Navigate to Destination
+     |       |
+     |       +-- Evaluate Routes
+     |       +-- Select Fastest Route
+     |
+     +-- Complete Handoff
+```
+
+This architecture demonstrates task decomposition and staged decision execution.
+
+---
+
+## Simulation Environment
+
+The application uses a fictional food-delivery environment with three predefined delivery routes.
+
+### Available Routes
+
+| Route | Base Travel Time | Distance | Cost |
+|---|---:|---:|---:|
+| A — Market Street | 10 minutes | 5 km | 100 units |
+| B — Riverside Drive | 16 minutes | 8 km | 150 units |
+| C — Garden Avenue | 12 minutes | 6 km | 120 units |
+
+### Delivery Process
+
+Each simulation includes:
+
+1. Restaurant preparation.
+2. Route selection.
+3. Vehicle navigation.
+4. Delivery handoff.
+5. Result and decision trace persistence.
+
+Restaurant preparation takes **5 simulated minutes**.
+
+Delivery handoff takes **2 simulated minutes**.
+
+### Route Duration Calculation
+
+```text
+Route Travel Time =
+    Base Travel Time
+    × Traffic Multiplier
+    × Weather Multiplier
+    × Seeded Route Variation
+```
+
+Final fractional movement steps preserve the modeled route duration.
+
+Agent predictions use nominal route conditions and cannot inspect the randomly sampled future variation.
+
+### Traffic and Weather
+
+Normal traffic multipliers:
+
+```text
+[1.0, 1.0, 1.0]
+```
+
+Heavy traffic multipliers:
+
+```text
+[2.2, 1.1, 1.3]
+```
+
+Rain multiplier:
+
+```text
+1.25
+```
+
+These values are simulation parameters rather than real-world traffic measurements.
+
+### Urgent Rain Example
+
+For the urgent-rain fixture:
+
+| Route | Predicted Total Duration |
+|---|---:|
+| A | 34.5 minutes |
+| B | 29 minutes |
+| C | 26.5 minutes |
+
+**Delivery deadline:** 28 minutes.
+
+This scenario demonstrates how different agent architectures respond to deadlines, route costs, and environmental conditions.
+
+### Road Closure Recovery
+
+The road-closure scenario includes a closure of Route A at simulation minute 8.
+
+- The fixed reflex policy reports failure.
+- Adaptive policies may select an alternative route.
+- Previously incurred travel costs remain charged.
+- The alternate route incurs its full modeled distance, duration, and cost.
+- Recovery decisions are saved in the execution trace.
+
+The environment uses an intentionally simplified fictional emergency-junction model. It is not a real geographic routing engine.
+
+---
+
+## Interactive 3D Visualization
+
+The project features a Three.js city visualization generated from local assets and geometry.
+
+### Environment Components
+
+- Buildings and city structures.
+- Streets and delivery routes.
+- River and bridges.
+- Trees and decorative objects.
+- Traffic and background vehicles.
+- Weather effects.
+- Animated delivery van.
+- Route ribbons and visual indicators.
+
+### Camera Controls
+
+| Action | Function |
+|---|---|
+| Left mouse drag | Orbit camera |
+| Right mouse drag | Pan camera |
+| Mouse wheel | Zoom |
+| Top View | Switch to overhead perspective |
+| Follow Van | Follow delivery vehicle |
+| Reset Camera | Restore default viewpoint |
+| Select Route | Highlight and inspect a route |
+
+### Replay Features
+
+The replay system supports:
+
+- Play and pause.
+- Timeline seeking.
+- Restart.
+- 0.5× playback.
+- 1× playback.
+- 2× playback.
+- 4× playback.
+
+The vehicle follows recorded simulation events. Playback changes presentation only; it does not rerun the decision algorithm.
+
+### Visualization Accuracy
+
+The saved simulation results remain authoritative.
+
+Decorative animations such as background traffic, water movement, route lighting, and arrival effects do not modify simulated outcomes.
+
+The visualization also includes performance measures:
+
+- Separately loaded Three.js components.
+- Capped canvas resolution.
+- Rendering pauses when the scene is hidden.
+- Resource cleanup when leaving the simulation page.
+- Reduced-motion support.
+- Fallback route map when WebGL is unavailable.
+
+---
+
+## Simulation and Decision-Making Logic
+
+The project is an educational, single-agent, single-order simulation model.
+
+Each comparison runs independent copies of the same environment so the agent strategies can be evaluated under shared conditions.
+
+### Experiment Reproducibility
+
+Simulations support:
+
+- Configurable random seed.
+- Scenario selection.
+- Delivery deadline.
+- Bounded travel variation.
+- Saved execution traces.
+- Persistent results.
+
+Using the same parameters supports repeatable comparisons.
+
+### Simulation Constraints
+
+- Maximum simulated duration: 180 minutes.
+- Maximum trace actions: 250.
+- Runs finish successfully or report explicit failure.
+- Agent choices and simulation results are stored for inspection.
+
+### Comparison Process
+
+```text
+Select Scenario and Seed
+           |
+           v
+Generate Shared Conditions
+           |
+           v
+Run Six Independent Agents
+           |
+           v
+Record Decisions and Results
+           |
+           v
+Compare Agent Performance
+           |
+           v
+Save Results to SQLite
+```
+
+---
+
+## Learning Agent and Training
+
+The Learning Agent implements contextual-bandit route selection.
+
+### Reward Function
+
+```text
+Reward =
+  -(Duration
+    + Cost / 20
+    + 4 × Lateness
+    + Failure Penalty)
+```
+
+The failure penalty is 200 when the delivery fails and 0 otherwise.
+
+### Training Strategy
+
+During training:
+
+1. Unvisited routes are sampled.
+2. The agent explores with an epsilon probability of 0.2.
+3. Otherwise, it exploits the route with the highest estimated mean reward.
+4. Rewards are recorded after each episode.
+5. Route value estimates are updated using an incremental sample average.
+6. Learned estimates are persisted in SQLite.
+
+### Training and Evaluation Separation
+
+The simulator separates training from ordinary evaluation.
+
+- Training explicitly changes learned route values.
+- Normal simulations do not update those values.
+- Untrained evaluation selects the first route.
+- Training contexts include scenario, deadline, route noise, and reward version.
+- The training interface uses the default deadline and zero-noise context.
+
+The saved evaluation uses 30 seeds and zero noise. Its result represents that specific experimental setting rather than proof of general performance across all environments.
+
+---
+
+## MCP Server Integration
+
+The project supports Model Context Protocol (MCP), allowing compatible AI clients to interact with the simulation tools.
+
+### Supported MCP Transports
+
+1. Standard input/output (stdio).
+2. Loopback Streamable HTTP.
+
+The MCP server can execute simulations, inspect agents, retrieve saved results, run comparisons, and train the learning policy.
+
+### Available MCP Tools
+
+| MCP Tool | Function |
+|---|---|
+| `list_agents` | Discover the six agent architectures and their identifiers |
+| `list_scenarios` | Retrieve available scenarios and default settings |
+| `run_simulation` | Execute one agent simulation and persist the result |
+| `run_comparison` | Execute all six agents under comparable conditions |
+| `get_run` | Retrieve complete metrics and execution evidence |
+| `list_runs` | Retrieve paginated saved simulation history |
+| `compare_runs` | Compare between 2 and 100 saved runs |
+| `train_learning` | Train the learning agent and persist its route values |
+
+### Example MCP Configuration
+
+For clients supporting the `mcpServers` configuration format:
 
 ```json
 {
   "mcpServers": {
     "agent-simulation": {
       "command": "D:\\Desktop\\Projects\\Agent Simulation MCP\\.venv\\Scripts\\python.exe",
-      "args": ["D:\\Desktop\\Projects\\Agent Simulation MCP\\mcp_server.py"]
+      "args": [
+        "D:\\Desktop\\Projects\\Agent Simulation MCP\\mcp_server.py"
+      ]
     }
   }
 }
 ```
 
-This configuration uses absolute paths and works regardless of the client's current directory. The client launches the server. The dashboard does not need to be running for stdio tools to work, and the MCP server does not need to be running to use the dashboard. Both use the same SQLite file. Refresh the dashboard after experiments created by an external client.
+**Note:** Update the paths to match your installation directory. This example uses the original Windows project path.
 
-Clients differ in configuration format; adapt the command and arguments to your client's settings. The supplied JSON is not automatically installed in any client's global configuration.
+The MCP client launches the stdio server directly. Running the web dashboard is not required for stdio tool access.
 
-For local HTTP:
+### Streamable HTTP
+
+From the project root:
 
 ```powershell
 .\.venv\Scripts\python.exe mcp_server.py --http
 ```
 
-Connect to `http://127.0.0.1:8001/mcp` with Streamable HTTP. The HTTP MCP server is a separate process from the API on port 8000. It binds to loopback and has no public-deployment authentication configured.
+MCP endpoint:
 
-| Tool | Behavior |
-|---|---|
-| `list_agents` | Discover six architectures and IDs |
-| `list_scenarios` | Discover fixtures and defaults |
-| `run_simulation` | Run one agent and save its result |
-| `run_comparison` | Run all six and return ranked summaries |
-| `get_run` | Retrieve full metrics, trace, and decision evidence |
-| `list_runs` | Paginated saved summaries |
-| `compare_runs` | Compare 2–100 saved results; flag differing conditions |
-| `train_learning` | Explicitly update and persist learning route values |
+```text
+http://127.0.0.1:8001/mcp
+```
 
-Example prompts:
+The MCP HTTP server runs independently of the FastAPI server on port 8000.
 
-- “Compare all six agents in `rain_urgent` with seed 42. Explain why the reflex and goal-based choices differ.”
-- “Run the model-based and reflex agents in `partial_visibility` and inspect their route-selection evidence.”
-- “Train the learning agent for 150 episodes in `rain_urgent`, then run it again and compare its outcome.”
-- “Run `road_closure` with the goal-based agent and explain the reroute and its extra cost.”
+It binds to the local loopback interface and is not configured for authenticated public deployment.
 
-The project intentionally uses and pins the tested **MCP Python SDK v1 maintenance API** (`FastMCP`, currently installed as `mcp==1.30.0`). Do not mix examples from SDK v2 into this code without a migration. See the [v1 SDK documentation](https://py.sdk.modelcontextprotocol.io/v1/).
+### Example AI Client Prompts
 
-## Interactive 3D simulation
+**Agent comparison**
 
-The main delivery panel uses Three.js with locally generated geometry and no remote 3D assets. Drag to orbit, scroll to zoom, and right-drag to pan. Use **Top view**, **Follow van**, or the reset-camera button to change perspective. Click a colored route ribbon to inspect it; **Clear** returns highlighting to the agent's current route. Route inspection changes the visual highlight only, not the agent's decision.
+> Compare all six agents in rain_urgent with seed 42. Explain why the reflex and goal-based choices differ.
 
-The green delivery van follows saved route-progress events, interpolating smoothly between recorded movement steps. Play/pause, seeking, restart, and playback speed control the replay. Restaurant preparation holds the van at pickup; delivery ends at the customer. Road closures show a barrier at the recorded time, and alternate legs are visually anchored at the emergency junction. This is display geometry; saved simulated distance, time, and cost remain authoritative.
+**Partial observability**
 
-Rain/clouds are shown for the rain scenario. Small background cars, water ripples, route light beads, and the arrival pulse are decorative animations and do not represent additional agent runs or change metrics. Ambient car speeds reflect the scenario's traffic multipliers. The **saved run's** scenario drives the displayed world; changing setup takes effect in the next run.
+> Run the model-based and reflex agents in partial_visibility and inspect their route-selection evidence.
 
-Three.js loads in a separate chunk. Canvas resolution is capped, the scene pauses rendering when off screen or the document is hidden, and geometry/materials/textures and event handlers are released when leaving the simulation page. Reduced-motion settings disable decorative motion and smooth interpolation. If WebGL is unavailable or its context is lost, the existing route map remains available with a visible fallback message.
+**Learning experiment**
 
-Frontend geometry/replay checks: run `npm.cmd test` in `frontend` (tested on Node 24).
+> Train the learning agent for 150 episodes in rain_urgent, then run it again and compare its outcome.
 
-## Clean setup and development
+**Road closure analysis**
 
-From the project folder:
+> Run road_closure with the goal-based agent and explain the reroute and its extra cost.
+
+### MCP SDK Compatibility
+
+The project uses the tested MCP Python SDK v1 maintenance API and FastMCP.
+
+The documented installed SDK version is:
+
+```text
+mcp==1.30.0
+```
+
+SDK v2 examples should not be mixed into this implementation without a migration.
+
+Reference: https://py.sdk.modelcontextprotocol.io/v1/
+
+---
+
+## Installation and Setup
+
+### Prerequisites
+
+Install:
+
+- Python 3.11 or newer.
+- Node.js 22.12+ or 24 LTS.
+- Git.
+- A modern browser supporting WebGL for the 3D view.
+
+The project does not require a cloud database or a model-provider API key for its core simulation.
+
+### Step 1 — Clone the Repository
+
+```bash
+git clone YOUR_REPOSITORY_URL
+```
+
+Enter the cloned directory.
+
+```powershell
+Set-Location "Agent Simulation MCP"
+```
+
+Replace the directory name with your actual cloned folder.
+
+### Step 2 — Run Automated Setup
+
+From PowerShell:
 
 ```powershell
 .\Setup.ps1
-.\.venv\Scripts\python.exe -m pytest -q
+```
+
+The setup script:
+
+1. Creates a Python virtual environment.
+2. Installs the pinned Python dependencies.
+3. Installs frontend dependencies using npm.
+4. Builds the React frontend.
+5. Initializes measured baseline simulations if the database contains no runs.
+
+The original Windows environment uses `requirements-lock.txt`.
+
+For another operating system or Python version, dependency resolution may need to use `requirements.txt` instead.
+
+### Step 3 — Start the Application
+
+Double-click:
+
+```text
+Start.cmd
+```
+
+Alternatively:
+
+```powershell
 .\Start.ps1
 ```
 
-`Setup.ps1` creates the virtual environment, installs `requirements-lock.txt`, runs `npm ci`, builds the frontend, and initializes baseline simulations if the database has no runs. The lock file records the tested Windows/Python environment. For another platform/Python version, resolve `requirements.txt` there instead, then verify dependencies and tests. `pywin32` in the lock file is Windows-specific.
+### Step 4 — Open the Dashboard
 
-For frontend hot reload, use two terminals:
+Application:
+
+http://127.0.0.1:8000
+
+FastAPI documentation:
+
+http://127.0.0.1:8000/docs
+
+Both addresses are local to the computer running the application.
+
+---
+
+## Running the Application
+
+### Start on an Alternative Port
+
+If port 8000 is occupied:
 
 ```powershell
-# Terminal 1, project root
-.\.venv\Scripts\python.exe -m uvicorn backend.api:app --host 127.0.0.1 --port 8000 --reload
+.\Start.ps1 -Port 8010
+```
 
-# Terminal 2
+### Start in the Background
+
+```powershell
+.\Start-Background.ps1
+```
+
+### Stop the Background Server
+
+```powershell
+.\Stop.ps1
+```
+
+Background logs are written to the `logs/` directory.
+
+The stopping script validates the target process before terminating it.
+
+### PowerShell Execution Policy
+
+If PowerShell blocks local scripts, use:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Start.ps1
+```
+
+Alternatively, run `Start.cmd`.
+
+The bypass applies to the launched process and does not permanently modify the Windows execution policy.
+
+---
+
+## Development and Testing
+
+### Backend Tests
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
+### Frontend Tests
+
+```powershell
+Set-Location frontend
+npm.cmd test
+```
+
+### Frontend Production Build
+
+```powershell
+npm.cmd run build
+```
+
+### Backend Development Server
+
+Run from the repository root:
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn backend.api:app --host 127.0.0.1 --port 8000 --reload
+```
+
+### Frontend Development Server
+
+In a second terminal:
+
+```powershell
 Set-Location frontend
 npm.cmd run dev
 ```
 
-Vite serves `http://127.0.0.1:5173` and proxies `/api` to the backend. After frontend changes, rebuild with `npm.cmd run build` inside `frontend`, then restart the production server. `Start.ps1` serves the last production build.
+The Vite development server runs at:
 
-Manual Inspector test:
+```text
+http://127.0.0.1:5173
+```
+
+It proxies API calls to the FastAPI backend.
+
+After modifying the frontend, rebuild it before running the production server.
+
+### MCP Inspector
+
+For manually inspecting MCP tools:
 
 ```powershell
 npx.cmd @modelcontextprotocol/inspector .\.venv\Scripts\python.exe mcp_server.py
 ```
 
-## Simulation model
+### Verification
 
-This is an educational single-order, single-agent model. Comparison creates independent copies; the six agents do not communicate or cooperate.
+The project documentation refers to:
 
-| Route | Base travel | Distance | Cost |
-|---|---:|---:|---:|
-| A · Market Street | 10 min | 5 km | 100 units |
-| B · Riverside Drive | 16 min | 8 km | 150 units |
-| C · Garden Avenue | 12 min | 6 km | 120 units |
+- [Architecture Documentation](docs/ARCHITECTURE.md)
+- [API Documentation](docs/API.md)
+- [Verification Documentation](docs/VERIFICATION.md)
 
-Preparation takes 5 minutes; handoff takes 2 minutes. Route time = base travel × traffic × weather × seeded route variation. Final fractional movement steps preserve exact modeled durations. Predictions use nominal route conditions and never read the sampled future travel variation.
+---
 
-Normal traffic multipliers are `[1,1,1]`. Heavy traffic uses `[2.2,1.1,1.3]`. Rain adds a 1.25 multiplier. In the urgent-rain fixture, total predicted durations are 34.5, 29, and 26.5 minutes, with a 28-minute deadline. Costs are fictional units, not real currency.
+## Database and Persistence
 
-**Architectures:** reflex uses current-only traffic rules; model-based reflex remembers missing observations; goal-based selects the cheapest deadline-feasible route with fastest fallback; utility minimizes duration + cost/20 + 4×lateness; learning uses a contextual bandit; hierarchy executes prepare, navigate, and handoff subtasks, using fastest-route selection in navigation. Lifecycle validation belongs to the shared environment. Goal/utility/hierarchy use the configured nominal route model.
+SQLite provides local persistence for simulation experiments.
 
-**Learning:** reward v1 = −(duration + cost/20 + 4×lateness + 200 if delivery fails). Untrained evaluation chooses the first route. Training samples unvisited routes, then explores with epsilon 0.2 or exploits the largest estimated mean reward. Each route mean uses the incremental sample average. Normal runs are frozen and never update the policy. Keys include scenario, deadline, noise, and reward version; the training UI deliberately trains the default-deadline, zero-noise context. Custom deadline/noise runs may therefore remain untrained. The saved 30-seed evaluation has zero noise and demonstrates this fixed scenario, not statistical generalization.
-
-**Closure recovery:** route A closes at minute 8. The fixed reflex policy reports failure. Adaptive policies can switch at a fictional emergency junction; previous travel remains charged, and the alternate leg incurs its full route distance/time/cost. This deliberately simple connector model is recorded in the trace. The map is illustrative, not a geographic routing engine; the 3D view anchors an alternate leg at the junction while retaining the backend's full-leg timing model.
-
-Runs are bounded to 180 simulated minutes and 250 trace actions. All built-in scenarios finish or explicitly fail. See [architecture](docs/ARCHITECTURE.md), [API examples](docs/API.md), and [verification](docs/VERIFICATION.md).
-
-## Data and scope
-
-All times are stored in UTC and displayed in the browser's local timezone. The database path is absolute relative to this project, so API/MCP processes share it regardless of working directory. Override with the `SIMULATION_DB` environment variable for isolated tests or another database location. SQLite WAL and transaction boundaries protect concurrent writers. Training writes route values and its session record in one transaction; comparisons save all runs in one transaction. Back up the SQLite database with SQLite's backup API while running, or copy it after stopping all API/MCP processes.
-
-This is a local application, not a publicly deployed service. No authentication, multi-user access model, live delivery integrations, payments, notifications, or provider-hosted LLM chat is included. Public hosting would require those deployment decisions and an authentication layer.
-
-## Source map
+### Database File
 
 ```text
-backend/
-  catalog.py       Agents, routes, and five scenarios
-  models.py        Validated API/MCP input contracts
-  engine.py        Seeded simulator and six decision strategies
-  storage.py       SQLite schema, persistence, summaries
-  service.py       Shared simulation, comparisons, training
-  api.py           FastAPI routes and production frontend hosting
-frontend/src/
-  main.tsx         React dashboard and playback controls
-  DeliveryScene.tsx Three.js city, vehicles, weather, cameras
-  sceneMath.ts     Trace-driven animation and route geometry
-  styles.css       Responsive visual system
-mcp_server.py      Eight MCP tools (stdio / Streamable HTTP)
-tests/             Engine, API, and real stdio MCP integration checks
-scripts/           One-time measured baseline initialization
-data/              Local database (excluded from Git)
+data/simulation.sqlite3
 ```
-#   A g e n t - S i m u l a t i o n - M C P  
- 
+
+### Stored Data
+
+The application stores:
+
+- Simulation configurations.
+- Agent selections.
+- Selected scenarios and seeds.
+- Simulation metrics.
+- Decision traces.
+- Saved comparisons.
+- Learning-agent estimates.
+- Training sessions and results.
+
+### Database Configuration
+
+The database path is resolved relative to the project so that the API and MCP processes can access the same data.
+
+To override the database location, configure:
+
+```text
+SIMULATION_DB
+```
+
+### Concurrency and Reliability
+
+The SQLite implementation uses WAL mode and transaction boundaries.
+
+- Concurrent processes can access persisted data.
+- Training updates and their session records are saved transactionally.
+- Comparative results are stored in a single transaction.
+- Tests use isolated databases where configured.
+
+For database backups while the application is running, use SQLite's backup API. Alternatively, stop the API and MCP processes before copying the database file.
+
+---
+
+## Project Structure
+
+```text
+Agent Simulation MCP/
+|
++-- backend/
+|   +-- catalog.py
+|   +-- models.py
+|   +-- engine.py
+|   +-- storage.py
+|   +-- service.py
+|   +-- api.py
+|
++-- frontend/
+|   +-- src/
+|   |   +-- main.tsx
+|   |   +-- DeliveryScene.tsx
+|   |   +-- sceneMath.ts
+|   |   +-- styles.css
+|   |
+|   +-- tests/
+|
++-- tests/
+|
++-- scripts/
+|
++-- docs/
+|   +-- ARCHITECTURE.md
+|   +-- API.md
+|   +-- VERIFICATION.md
+|
++-- data/
+|   +-- simulation.sqlite3
+|
++-- mcp_server.py
++-- Setup.ps1
++-- Start.ps1
++-- Start.cmd
++-- Start-Background.ps1
++-- Stop.ps1
++-- requirements.txt
++-- requirements-lock.txt
++-- README.md
+```
+
+### Important Modules
+
+| File | Responsibility |
+|---|---|
+| `backend/catalog.py` | Agent definitions, routes, and simulation scenarios |
+| `backend/models.py` | Input validation and data models |
+| `backend/engine.py` | Simulation engine and six decision strategies |
+| `backend/storage.py` | SQLite storage and result retrieval |
+| `backend/service.py` | Shared simulation, comparison, and training operations |
+| `backend/api.py` | FastAPI endpoints and frontend hosting |
+| `frontend/src/main.tsx` | React dashboard and replay controls |
+| `frontend/src/DeliveryScene.tsx` | Three.js visualization |
+| `frontend/src/sceneMath.ts` | Trace-driven animation and route geometry |
+| `mcp_server.py` | Eight MCP tools |
+| `tests/` | Backend and MCP integration tests |
+
+---
+
+## Limitations and Scope
+
+This project is a local educational simulation platform.
+
+### Current Scope
+
+- Fictional food-delivery environment.
+- Six independently evaluated agent architectures.
+- Reproducible scenario-based experimentation.
+- Local simulation and visualization.
+- Persistent experiment history.
+- MCP access from compatible external clients.
+
+### Current Limitations
+
+- No publicly hosted deployment.
+- No built-in user authentication.
+- No multi-user access model.
+- No real-world delivery or maps integration.
+- No payment processing.
+- No notification service.
+- No built-in provider-hosted LLM chat.
+- No communication or cooperation between the six simulated agents.
+- No guarantee that simulated performance transfers to real delivery operations.
+
+Public deployment would require additional hosting, security, authentication, and operational decisions.
+
+---
+
+## Educational Purpose
+
+Agent Simulation Lab provides a practical environment for exploring AI agent architectures, decision-making under different environmental conditions, route selection, utility optimization, learning through feedback, experimental reproducibility, and MCP-based tool integration.
+
+It is designed to make agent behavior observable and comparable through structured simulation results and interactive visualization.
+
+---
+
+**Agent Simulation Lab — Built with Python, FastAPI, React, Three.js, SQLite, and Model Context Protocol.**
